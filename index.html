@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="./node_modules/axios/dist/axios.min.js"></script>
+  <title>مواقيت الصلاة</title>
+</head>
+<style>
+  body {
+    background: linear-gradient(45deg, #240165, #05001c);
+  }
+
+  #city-name {
+    font-size: 400;
+    font-size: 100px;
+    color: white;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+  }
+
+  .card {
+    width: 12%;
+    height: 95%;
+    background-color: white;
+    font-size: 20px;
+    box-shadow: 0px 10px 5px rgb(0 0 0 /30%);
+  }
+
+  .header {
+    background: linear-gradient(45deg, #5709ee, #7a37bf);
+    color: white;
+
+  }
+
+  .header h1 {
+    font-weight: 400;
+    padding: 5px;
+  }
+
+  .center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .time {
+    font-size: 70px;
+  }
+</style>
+
+<body style="direction: rtl;">
+
+  <div style="margin-top: 100px; height:100vh ;">
+
+    <div>
+      <!-- city name -->
+      <div style="color: white;margin-right: 40px;">
+        <h1 id="city-name">جدة</h1>
+        <h6 style="font-size: 40px; font-weight: 200;" id="date">الجمعة</h6>
+      </div>
+      <!-- city name -->
+      <hr style="margin: 0px 50px;">
+
+      <!--PRAYER TIMING-->
+      <div class="center" style="height: 300px; margin-top:80px; justify-content: space-around;">
+        <!--CARD-->
+        <div class="card">
+          <div class="header">
+            <h1>الفجر</h1>
+          </div>
+          <div class="body center" style="height: 80%;">
+            <h1 class="time" id="fajer-time">4:30</h1>
+
+          </div>
+        </div>
+        <!--CARD-->
+        <!--CARD-->
+        <div class="card">
+          <div class="header">
+            <h1>الشروق</h1>
+          </div>
+          <div class="body center" style="height: 80%;">
+            <h1 class="time" id="sunrise-time">4:30</h1>
+
+          </div>
+        </div>
+        <!--CARD-->
+        <!--CARD-->
+        <div class="card">
+          <div class="header">
+            <h1>الظهر</h1>
+          </div>
+          <div class="body center" style="height: 80%;">
+            <h1 class="time" id="dhurh-time">4:30</h1>
+
+          </div>
+        </div>
+        <!--CARD-->
+        <!--CARD-->
+        <div class="card">
+          <div class="header">
+            <h1>العصر</h1>
+          </div>
+          <div class="body center" style="height: 80%;">
+            <h1 class="time" id="asr-time">4:30</h1>
+
+          </div>
+        </div>
+        <!--CARD-->
+        <!--CARD-->
+        <div class="card">
+          <div class="header">
+            <h1>المغرب</h1>
+          </div>
+          <div class="body center" style="height: 80%;">
+            <h1 class="time" id="sunset-time">4:30</h1>
+
+          </div>
+        </div>
+        <!--CARD-->
+        <!--CARD-->
+        <div class="card">
+          <div class="header">
+            <h1>العشاء</h1>
+          </div>
+          <div class="body cnter" style="height: 80%;">
+            <h1 class="time" id="isha-time">4:30</h1>
+
+          </div>
+        </div>
+        <!--CARD-->
+
+      </div>
+      <!--PRAYER TIMING-->
+      <!--CHANGE CITY SELECTED-->
+      <div class="center" style="margin-top: 120px;">
+        <select name="" id="cities-select"
+          style="width: 300px;height: 35px; font-size:25px; background: none;color: white;padding: 5px; border-radius:20px;">
+
+
+        </select>
+      </div>
+      <!--CHANGE CITY SELECTED-->
+
+      <div>
+
+      </div>
+
+    </div>
+
+
+  </div>
+</body>
+<script>
+  let cities = [
+   {
+    arabicName: "الرياض",
+    name:"Riyadh,Saudi+Arabia" 
+   },
+   {
+    arabicName: "الشرقية",
+    name:"Dammam,Saudi+Arabia" 
+   },
+   {
+    arabicName: "جدة",
+    name:"Jeddah,Saudi+Arabia"
+   }
+
+  ]
+  for (let city of cities) {
+    const content = `
+    <option>${city.arabicName}</option>
+    `
+    document.getElementById("cities-select").innerHTML += content
+  }
+  document.getElementById("cities-select").addEventListener("change", function () {
+
+    document.getElementById("city-name").innerHTML = this.value
+    
+    let addressName =" "
+    for (let city of cities){
+      if (city.arabicName == this.value){
+         addressName = city.name
+
+      }
+    }
+    getPrayersTimingsOfCity(addressName)
+  })
+
+    getPrayersTimingsOfCity("Makkah,Saudi+Arabia")
+
+  function getPrayersTimingsOfCity(addressName) {
+    let params = {
+      address: addressName  
+    }
+    axios.get("https://api.aladhan.com/v1/timingsByAddress/18-05-2025", {
+      params: params
+
+    })
+      .then(function (response) {
+        const timings = response.data.data.timings
+        fillTimeForPrayer("fajer-time", timings.Fajr)
+        fillTimeForPrayer("sunrise-time", timings.Sunrise)
+        fillTimeForPrayer("dhurh-time", timings.Dhuhr)
+        fillTimeForPrayer("asr-time", timings.Asr)
+        fillTimeForPrayer("sunset-time", timings.Sunset)
+        fillTimeForPrayer("isha-time", timings.Isha)
+
+        const date = response.data.data.date.readable
+
+        const b = document.getElementById("date").innerHTML = date
+
+        console.log(response.data.data.date)
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+    function fillTimeForPrayer(id, time) {
+      document.getElementById(id).innerHTML = time
+
+    }
+  }
+  getPrayersTimingsOfCity("Jeddah,Saudi+Arabia")
+</script>
+
+</html>
